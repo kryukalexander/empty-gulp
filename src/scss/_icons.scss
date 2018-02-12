@@ -1,0 +1,22 @@
+@mixin iconImage ($image, $color,  $color-hover: $color) {
+    background: svg-load($image, fill=$color);
+
+    &:hover {
+        background: svg-load($image, fill=$color-hover);
+    }
+}
+
+.icon {
+    width: 1em;
+    height: 1em;
+    margin: 0 0.5em;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+
+    &-arrow-down {
+        @include iconImage($icons + 'down-chevron.svg', black, red)
+    }
+}
+

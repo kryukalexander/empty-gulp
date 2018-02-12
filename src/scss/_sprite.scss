@@ -1,0 +1,19 @@
+$retina-sprites: false;
+$sprite-list: ('youtube', 'cloud', 'reddit', 'australia');
+
+@mixin SpriteImage ($image, $path: $sprite, $extension: '.png') {
+    height: height($path + $image + $extension);
+    width: width($path + $image + $extension);
+
+    @if $retina-sprites { background: url($path + $image + $extension) at-2x; }
+    @else { background: url($path + $image + $extension); }
+}
+
+.sprite {
+    display: inline-block;
+    margin: 0 0.25em;
+
+    @each $image in $sprite-list {
+        &-#{$image} { @include SpriteImage($image); }
+    }
+}

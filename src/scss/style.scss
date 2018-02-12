@@ -1,0 +1,16 @@
+@import 'vendor';
+@import 'variables';
+@import 'sprite';
+@import 'icons';
+
+body {
+    background-color: $body-bg;
+}
+
+h1 {
+    color: $header-col;
+}
+
+p {
+    color: $p-col;
+}
