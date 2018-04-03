@@ -18,7 +18,7 @@ const build = './build/';
 const folders = {
 
     styles: {
-        dev: root + 'scss/**/*.scss',
+        dev: root + 'css/**/*.scss',
         build: build + 'css/'
     },
 
