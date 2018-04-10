@@ -37,7 +37,6 @@
     "posthtml-include": "^1.1.0"
   },
   "dependencies": {
-    "gulp-tap": "^1.0.1",
     "normalize.css": "^7.0.0"
   },
   "browserslist": [
