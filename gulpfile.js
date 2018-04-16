@@ -12,46 +12,46 @@ const pngquant = require('imagemin-pngquant');
 const del = require('del');
 const concat = require('gulp-concat');
 
-const root = './src/';
-const build = './build/';
+const FolderStructure = function(root, build) {
 
-const folders = {
+    this.root = root;
+    this.build = build;
+    
+    this.styles = {
+        dev: this.root + 'css/**/*.scss',
+        build: this.build + 'css/'
+    };
 
-    styles: {
-        dev: root + 'css/**/*.scss',
-        build: build + 'css/'
-    },
+    this.createIgnoreFolders = (arr, prefix) => {
+        let result = [];
+        arr.map( (el) => {result.push( '!' + this.root + prefix + el)} );
+        return result;
+    };
 
-    html: {
-        dev: root + '**/*.html',
-        build: build,
-        ignore: [
-            '!' + root + '/include/**/',
-            '!' + root + '/include/**/*.html'
-        ]
-    },
+    this.html = {
+        dev: this.root + '**/*.html',
+        build: this.build,
+        ignore: this.createIgnoreFolders(['/**/', '/**/*.html'], '/include')
+    };
 
-    js: {
-        dev: root + 'js/*.js',
-        build: build + 'js'
-    },
+    this.js = {
+        dev: this.root + 'js/*.js',
+        build: this.build + 'js'
+    };
 
-    images: {
-        dev: root + 'images/**/*',
-        build: build + 'images',
-        ignore: [
-            '!' + root + 'images/images-sprite/*',
-            '!' + root + 'images/images-vector/*',
-            '!' + root + 'images/images-sprite/',
-            '!' + root + 'images/images-vector/',
-        ]
-    },
+    this.images = {
+        dev: this.root + 'images/**/*',
+        build: this.build + 'images',
+        ignore: this.createIgnoreFolders([ 'sprite/*', 'vector/*', 'sprite/', 'vector/' ], 'images/images-')
+    };
 
-    fonts: {
-        dev: root + 'fonts/**/*',
-        build: build + 'fonts'
-    }
+    this.fonts = {
+        dev: this.root + 'fonts/**/*',
+        build: this.build + 'fonts'
+    };
 };
+
+const folders = new FolderStructure('./src/', './build/');
 
 //CSS
 gulp.task('css', () => {
@@ -106,13 +106,10 @@ gulp.task('build:images', ['css'], () => {
 //Browser sync
 gulp.task('browser-sync', () => {
     browserSync({
-        server: {
-            baseDir: build
-
-            //for all directory view
-            , directory: true
+        server: { 
+            baseDir: folders.build, 
+            directory: true
         },
-
         notify: false
     });
 });
@@ -127,7 +124,7 @@ gulp.task('watch', ['build:all', 'browser-sync'], () => {
 
 //Clean
 gulp.task('clean', () => {
-    del.sync(build);
+    del.sync(folders.build);
     del.sync('src/images/sprite.png');
     del.sync('src/images/sprite.svg');
 });
