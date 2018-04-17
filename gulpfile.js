@@ -24,7 +24,7 @@ const FolderStructure = function(root, build) {
 
     this.createIgnoreFolders = (arr, prefix) => {
         let result = [];
-        arr.map( (el) => {result.push( '!' + this.root + prefix + el)} );
+        arr.map( (el) => {result.push( '!' + this.root + (prefix ? prefix : '') + el)} );
         return result;
     };
 
