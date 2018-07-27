@@ -79,7 +79,7 @@ gulp.task('css', () => {
     }
 });
 
-gulp.task('sprite', ()=>{
+gulp.task('sprite', () => {
    const spriteConfig = {
        mode: {
            symbol: {
