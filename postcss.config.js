@@ -16,7 +16,6 @@ module.exports = {
                 return Promise.resolve();
             }
         },
-        'postcss-inline-svg': {},
         'cssnano' : {}
     }
 };

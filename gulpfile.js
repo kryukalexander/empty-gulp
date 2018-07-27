@@ -11,6 +11,7 @@ const imagemin = require('gulp-imagemin');
 const pngquant = require('imagemin-pngquant');
 const del = require('del');
 const concat = require('gulp-concat');
+const svgSprite = require('gulp-svg-sprite');
 
 const FolderStructure = function(root, build) {
 
@@ -35,7 +36,7 @@ const FolderStructure = function(root, build) {
     };
 
     this.js = {
-        dev: this.root + 'js/*.js',
+        dev: [this.root + 'js/*.js', 'node_modules'],
         build: this.build + 'js'
     };
 
@@ -43,6 +44,11 @@ const FolderStructure = function(root, build) {
         dev: this.root + 'images/**/*',
         build: this.build + 'images',
         ignore: this.createIgnoreFolders([ 'sprite/*', 'vector/*', 'sprite/', 'vector/' ], 'images/images-')
+    };
+
+    this.sprite = {
+        dev: this.root + 'images/images-vector/*.svg',
+        build: this.build + 'images',
     };
 
     this.fonts = {
@@ -72,6 +78,22 @@ gulp.task('css', () => {
             .pipe(gulp.dest(folders.styles.build));
     }
 });
+
+gulp.task('sprite', () => {
+   const spriteConfig = {
+       mode: {
+           symbol: {
+               dest: '.',
+               sprite: 'sprite.svg'
+           }
+       }
+   };
+    return gulp.src(folders.sprite.dev)
+        .pipe(svgSprite(spriteConfig))
+        .pipe(gulp.dest(folders.sprite.build));
+});
+
+
 
 //JS
 gulp.task('js', () => {
@@ -117,6 +139,7 @@ gulp.task('browser-sync', () => {
 //Watch
 gulp.task('watch', ['build:all', 'browser-sync'], () => {
     gulp.watch(folders.styles.dev, ['css', browserSync.reload]);
+    gulp.watch(folders.sprite.dev, ['sprite', browserSync.reload]);
     gulp.watch(folders.js.dev, ['js', browserSync.reload]);
     gulp.watch(folders.html.dev, ['html', browserSync.reload]);
     gulp.watch('./posthtml.config.js', ['html', browserSync.reload]);
@@ -130,6 +153,6 @@ gulp.task('clean', () => {
 });
 
 //Build
-gulp.task('build:all', ['clean', 'html', 'js', 'build:images'], () => {
+gulp.task('build:all', ['clean', 'html', 'js', 'build:images', 'sprite'], () => {
     gulp.src(folders.fonts.dev).pipe(gulp.dest(folders.fonts.build));
 });
