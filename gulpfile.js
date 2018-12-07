@@ -23,10 +23,8 @@ const FolderStructure = function(root, build) {
         build: this.build + 'css/'
     };
 
-    this.createIgnoreFolders = (arr, prefix) => {
-        let result = [];
-        arr.map( (el) => {result.push( '!' + this.root + (prefix ? prefix : '') + el)} );
-        return result;
+    this.createIgnoreFolders = (arr, prefix = '') => {
+        return arr.map( el => '!' + this.root + prefix + el )
     };
 
     this.html = {
