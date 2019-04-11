@@ -58,7 +58,7 @@ const FolderStructure = function(root, build) {
 const folders = new FolderStructure('./src/', './build/');
 
 //CSS
-gulp.task('css', () => {
+function css() {
     let isProd = process.env.npm_lifecycle_event === 'build';
 
     if (isProd) {
@@ -75,9 +75,11 @@ gulp.task('css', () => {
             .pipe(sourcemaps.write('./maps'))
             .pipe(gulp.dest(folders.styles.build));
     }
-});
+}
 
-gulp.task('sprite', () => {
+
+
+function sprite() {
    const spriteConfig = {
        mode: {
            symbol: {
@@ -89,68 +91,81 @@ gulp.task('sprite', () => {
     return gulp.src(folders.sprite.dev)
         .pipe(svgSprite(spriteConfig))
         .pipe(gulp.dest(folders.sprite.build));
-});
-
+}
 
 
 //JS
-gulp.task('js', () => {
+function js()  {
     let scripts = folders.js.dev;
     return gulp.src(scripts)
         .pipe(concat('script.js'))
         .pipe(uglify())
         .pipe(gulp.dest(folders.js.build));
-});
+}
+
 
 //HTML
-gulp.task('html', () => {
+function html() {
     return gulp.src( [folders.html.dev, ...folders.html.ignore] )
         .pipe(posthtml())
         .pipe(gulp.dest(folders.html.build));
-});
+}
+
+exports.html = html;
 
 //Images
-gulp.task('build:images', ['css'], () => {
-    gulp.src( [folders.images.dev, ...folders.images.ignore] )
+function buildImages () {
+    return gulp.src( [folders.images.dev, ...folders.images.ignore] )
 
-        .pipe(imagemin({
-            interlaced: true,
-            progressive: true,
-            svgoPlugins: [{removeViewBox: false}],
-            use: [pngquant()]
-        }))
+            .pipe(imagemin({
+                interlaced: true,
+                progressive: true,
+                svgoPlugins: [{removeViewBox: false}],
+                use: [pngquant()]
+            }))
 
-        .pipe(gulp.dest(folders.images.build));
-});
+            .pipe(gulp.dest(folders.images.build));
+}
 
-//Browser sync
-gulp.task('browser-sync', () => {
-    browserSync({
-        server: { 
-            baseDir: folders.build, 
+// Browser sync
+function sync() {
+    browserSync.init({
+        server: {
+            baseDir: folders.build,
             directory: true
         },
         notify: false
     });
-});
+}
 
-//Watch
-gulp.task('watch', ['build:all', 'browser-sync'], () => {
-    gulp.watch(folders.styles.dev, ['css', browserSync.reload]);
-    gulp.watch(folders.sprite.dev, ['sprite', browserSync.reload]);
-    gulp.watch(folders.js.dev, ['js', browserSync.reload]);
-    gulp.watch(folders.html.dev, ['html', browserSync.reload]);
-    gulp.watch('./posthtml.config.js', ['html', browserSync.reload]);
-});
+// Watch
+function watch(done) {
+    gulp.watch(folders.styles.dev, css);
+    gulp.watch(folders.sprite.dev, sprite);
+    gulp.watch(folders.js.dev, js);
+    gulp.watch(folders.html.dev, html );
+    gulp.watch('./posthtml.config.js', html);
+    done();
+}
 
 //Clean
-gulp.task('clean', () => {
+function clean(done) {
     del.sync(folders.build);
     del.sync('src/images/sprite.png');
     del.sync('src/images/sprite.svg');
-});
+    done();
+}
 
 //Build
-gulp.task('build:all', ['clean', 'html', 'js', 'build:images', 'sprite'], () => {
-    gulp.src(folders.fonts.dev).pipe(gulp.dest(folders.fonts.build));
-});
+
+function buildAll () {
+    return gulp.src(folders.fonts.dev).pipe(gulp.dest(folders.fonts.build));
+}
+
+exports.buildImages = gulp.series(css, buildImages);
+exports.buildAll = gulp.series(clean, html, css, js, buildImages, sprite, buildAll);
+exports.watch = gulp.series(buildAll, sync, watch);
+exports.css = css;
+exports.js = js;
+exports.sprite = sprite;
+exports.clean = clean;
